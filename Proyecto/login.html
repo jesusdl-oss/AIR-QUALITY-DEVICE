@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de Sesión</title>
+    <style>
+        body {
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('UTB.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.8); /* Fondo blanco semi-transparente */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        input {
+            margin-bottom: 10px;
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+        }
+        h2 {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Bienvenido, Inicia sesión</h2>
+        <input type="text" id="username" placeholder="Usuario" required>
+        <input type="password" id="password" placeholder="Contraseña" required>
+        <button id="loginButton">Ingresar</button>
+        <button id="guestButton">Ingresar como Invitado</button>
+        <p id="errorMessage" style="color: red; display: none;"></p>
+        <p id="loadingMessage" class="loading">Cargando...</p>
+    </div>
+
+    <script>
+        // Evento para el botón de "Ingresar"
+        document.getElementById('loginButton').addEventListener('click', async () => {
+            const user = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (!user || !password) {
+                document.getElementById('errorMessage').textContent = 'Por favor, completa todos los campos.';
+                document.getElementById('errorMessage').style.display = 'block';
+                return;
+            }
+
+            document.getElementById('loadingMessage').style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+
+            try {
+                const response = await fetch('data/usuarios.txt'); // Verifica que la ruta sea correcta
+                if (!response.ok) {
+                    throw new Error('Error en la conexión: ' + response.statusText);
+                }
+
+                const data = await response.text();
+                const users = data.split('\n')
+                    .map(line => line.split(':'))
+                    .filter(parts => parts.length === 2) // Filtra líneas no válidas
+                    .map(parts => ({ username: parts[0].trim(), password: parts[1].trim() }));
+
+                const userFound = users.find(u => u.username === user && u.password === password);
+
+                if (userFound) {
+                    localStorage.setItem('loggedInUser', user); // Guarda el usuario en localStorage
+                    localStorage.setItem('guest', 'false'); // Establece que no es invitado
+                    window.location.href = 'index.html'; // Redirige a la página principal
+                } else {
+                    document.getElementById('errorMessage').textContent = 'Usuario o contraseña incorrectos';
+                    document.getElementById('errorMessage').style.display = 'block';
+                }
+            } catch (error) {
+                document.getElementById('errorMessage').textContent = error.message; // Muestra el error real
+                document.getElementById('errorMessage').style.display = 'block';
+            } finally {
+                document.getElementById('loadingMessage').style.display = 'none';
+            }
+        });
+
+        // Evento para el botón de "Ingresar como Invitado"
+        document.getElementById('guestButton').addEventListener('click', () => {
+            localStorage.setItem('loggedInUser', 'guest'); // Almacena el estado de invitado
+            localStorage.setItem('guest', 'true'); // Establece que es invitado
+            window.location.href = 'index.html'; // Redirige a la página principal
+        });
+    </script>
+</body>
+</html>

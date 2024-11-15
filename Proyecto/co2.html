@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CO2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            margin: 0;
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('UTB.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            flex-direction: column;
+            padding-top: 10px;
+        }
+        .title {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            color: white; /* Para que el texto destaque sobre el fondo */
+        }
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: white;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .back-button img {
+            width: 45px;
+            height: 45px;
+        }
+        .co2-container {
+            display: flex;
+            flex-direction: column;
+            width: 95%;
+            padding: 0 20px;
+            margin-top: 70px;
+            align-items: center;
+        }
+        .co2-item {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 22px;
+            color: white; /* Color del texto */
+        }
+        .chart-container {
+            background-color: rgba(255, 255, 255, 0.8); /* Fondo blanco semi-transparente */
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 1000px; /* Ancho máximo aumentado */
+            height: 500px; /* Altura fija del contenedor */
+        }
+        canvas {
+            max-height: 450px; /* Altura máxima aumentada */
+            width: 100% !important; /* Asegurar que el canvas ocupe todo el ancho */
+        }
+    </style>
+</head>
+<body>
+    <div class="title">CO2</div>
+    <button class="back-button" onclick="history.back()">
+        <img src="monitor/flecha.png" alt="Flecha">
+    </button>
+    
+    <div class="co2-container">
+        <div class="co2-item">
+            <div id="co2Display1">Med1 CO2: -- PPM</div>
+            <div class="chart-container">
+                <canvas id="chart1"></canvas>
+            </div>
+        </div>
+        <div class="co2-item">
+            <div id="co2Display2">Med2 CO2: -- PPM</div>
+            <div class="chart-container">
+                <canvas id="chart2"></canvas>
+            </div>
+        </div>
+        <div class="co2-item">
+            <div id="co2Display3">Med3 CO2: -- PPM</div>
+            <div class="chart-container">
+                <canvas id="chart3"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchData() {
+            const response = await fetch('https://script.google.com/macros/s/AKfycbzu-5j4yPIabA2P11vK8OdQIOy4QskWuP4-RVWL342CskZSV_hAx-CVC1r5YTc3v9RlSQ/exec');
+            const data = await response.json();
+            return data;
+        }
+
+        async function updateCO2Display() {
+            const data = await fetchData();
+            const latestRow = data[data.length - 1];
+
+            const co2_1 = latestRow[1];
+            const co2_2 = latestRow[5];
+            const co2_3 = latestRow[9];
+
+            document.getElementById('co2Display1').innerText = `Med1 CO2: ${co2_1} PPM`;
+            document.getElementById('co2Display2').innerText = `Med2 CO2: ${co2_2} PPM`;
+            document.getElementById('co2Display3').innerText = `Med3 CO2: ${co2_3} PPM`;
+
+            // Usar las columnas correctas para las etiquetas de fecha y hora en cada medidor
+            const datetimeData1 = data.map(row => row[0]); // Fecha y hora de Med1 (Columna 0)
+            const datetimeData2 = data.map(row => row[4]); // Fecha y hora de Med2 (Columna 4)
+            const datetimeData3 = data.map(row => row[8]); // Fecha y hora de Med3 (Columna 8)
+
+            // Crear gráficos, filtrando datos vacíos
+            createChart('chart1', datetimeData1, data.map(row => row[1]), 'Med1 CO2');
+            createChart('chart2', datetimeData2, data.map(row => row[5]), 'Med2 CO2');
+            createChart('chart3', datetimeData3, data.map(row => row[9]), 'Med3 CO2');
+        }
+
+        function createChart(canvasId, labels, data, label) {
+            // Filtrar los datos y las etiquetas (fechas) para excluir los vacíos
+            const filteredData = data.map((value, index) => ({ value, label: labels[index] }))
+                                     .filter(entry => entry.value !== null && entry.value !== '' && entry.value !== undefined);
+
+            // Separar de nuevo las etiquetas y los valores filtrados
+            const filteredLabels = filteredData.map(entry => entry.label);
+            const filteredValues = filteredData.map(entry => entry.value);
+
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: filteredLabels,
+                    datasets: [{
+                        label: label,
+                        data: filteredValues,
+                        borderColor: 'rgba(0, 204, 0, 1)', // Color verde
+                        borderWidth: 2,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Permitir que el gráfico cambie de tamaño
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Fecha y Hora'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'CO2 (PPM)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        setInterval(updateCO2Display, 5000);
+        updateCO2Display();
+
+
+    </script>
+</body>
+</html>

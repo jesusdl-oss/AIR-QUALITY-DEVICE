@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Humedad</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            margin: 0;
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('UTB.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            flex-direction: column;
+            padding-top: 10px;
+        }
+        .title {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            color: white; /* Color blanco para que destaque sobre el fondo */
+        }
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: white;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .back-button img {
+            width: 45px;
+            height: 45px;
+        }
+        .humidity-container {
+            display: flex;
+            flex-direction: column;
+            width: 95%;
+            padding: 0 20px;
+            margin-top: 70px;
+            align-items: center;
+        }
+        .humidity-item {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 22px;
+            color: white; /* Color del texto */
+        }
+        .chart-container {
+            background-color: rgba(255, 255, 255, 0.8); /* Fondo blanco semi-transparente */
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 1000px; /* Ancho máximo aumentado */
+            height: 500px; /* Altura fija del contenedor */
+        }
+        canvas {
+            max-height: 450px; /* Altura máxima aumentada */
+            width: 100% !important; /* Asegurar que el canvas ocupe todo el ancho */
+        }
+    </style>
+</head>
+<body>
+    <div class="title">Humedad</div>
+    <button class="back-button" onclick="history.back()">
+        <img src="monitor/flecha.png" alt="Flecha">
+    </button>
+    
+    <div class="humidity-container">
+        <div class="humidity-item">
+            <div id="humidityDisplay1">Med1 Humedad: -- %</div>
+            <div class="chart-container">
+                <canvas id="chart1"></canvas>
+            </div>
+        </div>
+        <div class="humidity-item">
+            <div id="humidityDisplay2">Med2 Humedad: -- %</div>
+            <div class="chart-container">
+                <canvas id="chart2"></canvas>
+            </div>
+        </div>
+        <div class="humidity-item">
+            <div id="humidityDisplay3">Med3 Humedad: -- %</div>
+            <div class="chart-container">
+                <canvas id="chart3"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchData() {
+            const response = await fetch('https://script.google.com/macros/s/AKfycbzu-5j4yPIabA2P11vK8OdQIOy4QskWuP4-RVWL342CskZSV_hAx-CVC1r5YTc3v9RlSQ/exec');
+            const data = await response.json();
+            return data;
+        }
+
+        async function updateHumidityDisplay() {
+            const data = await fetchData();
+            const latestRow = data[data.length - 1];
+
+            const humidity_1 = latestRow[3];
+            const humidity_2 = latestRow[7];
+            const humidity_3 = latestRow[11];
+
+            document.getElementById('humidityDisplay1').innerText = `Med1 Humedad: ${humidity_1} %`;
+            document.getElementById('humidityDisplay2').innerText = `Med2 Humedad: ${humidity_2} %`;
+            document.getElementById('humidityDisplay3').innerText = `Med3 Humedad: ${humidity_3} %`;
+
+            // Usar las columnas correctas para las etiquetas de fecha y hora en cada medidor
+            const datetimeData1 = data.map(row => row[0]); // Fecha y hora de Med1 (Columna 0)
+            const datetimeData2 = data.map(row => row[4]); // Fecha y hora de Med2 (Columna 4)
+            const datetimeData3 = data.map(row => row[8]); // Fecha y hora de Med3 (Columna 8)
+
+            // Crear gráficos, filtrando datos vacíos
+            createChart('chart1', datetimeData1, data.map(row => row[3]), 'Med1 Humedad');
+            createChart('chart2', datetimeData2, data.map(row => row[7]), 'Med2 Humedad');
+            createChart('chart3', datetimeData3, data.map(row => row[11]), 'Med3 Humedad');
+        }
+
+        function createChart(canvasId, labels, data, label) {
+            // Filtrar los datos y las etiquetas (fechas) para excluir los vacíos
+            const filteredData = data.map((value, index) => ({ value, label: labels[index] }))
+                                     .filter(entry => entry.value !== null && entry.value !== '' && entry.value !== undefined);
+
+            // Separar de nuevo las etiquetas y los valores filtrados
+            const filteredLabels = filteredData.map(entry => entry.label);
+            const filteredValues = filteredData.map(entry => entry.value);
+
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: filteredLabels,
+                    datasets: [{
+                        label: label,
+                        data: filteredValues,
+                        borderColor: 'rgba(0, 0, 139, 1)', // Color azul
+                        borderWidth: 2,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Permitir que el gráfico cambie de tamaño
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Fecha y Hora'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Humedad (%)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        setInterval(updateHumidityDisplay, 5000);
+        updateHumidityDisplay();
+
+ 
+    </script>
+</body>
+</html>

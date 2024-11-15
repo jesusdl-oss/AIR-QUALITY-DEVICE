@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('UTB.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.8); /* Fondo blanco semi-transparente */
+            max-width: 100%;
+            box-sizing: border-box;
+            position: relative; /* Para posicionar el botón de cerrar sesión */
+        }
+        .current-values {
+            margin-bottom: 20px;
+        }
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        .sensor-button {
+            background-color: #007BFF;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            max-width: 250px;
+        }
+        .sensor-button img {
+            width: 30px;
+        }
+        .sensor-button:hover {
+            background-color: #0056b3;
+        }
+        .logout-button {
+            position: absolute;
+            bottom: 20px; /* Coloca el botón en la parte inferior */
+            left: 20px; /* Coloca el botón en la parte izquierda */
+            background-color: #dc3545;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .logout-button img {
+            width: 20px; /* Ajusta el tamaño de la imagen */
+            height: auto;
+        }
+        .logout-button:hover {
+            background-color: #c82333;
+        }
+        @media (max-width: 600px) {
+            .sensor-button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+            .sensor-button img {
+                width: 20px;
+            }
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Monitor de Calidad de Aire</h1>
+        <div class="current-values">
+            <h2>Valores Actuales</h2>
+            <p>CO2: <span id="co2-value">-</span> ppm</p>
+            <p>Temperatura: <span id="temperature-value">-</span> °C</p>
+            <p>Humedad: <span id="humidity-value">-</span> %</p>
+        </div>
+        <div class="button-container">
+            <button class="sensor-button" id="general-button">
+                <img src="monitor/General.png" alt="General">
+                General
+            </button>
+            <button class="sensor-button" id="co2-button">
+                <img src="monitor/CO2.png" alt="CO2">
+                CO2
+            </button>
+            <button class="sensor-button" id="temperature-button">
+                <img src="monitor/Termometro.png" alt="Termómetro">
+                Temperatura
+            </button>
+            <button class="sensor-button" id="humidity-button">
+                <img src="monitor/Humedad.png" alt="Humedad">
+                Humedad
+            </button>
+        </div>
+        <button class="logout-button" id="logoutButton">
+            <img src="monitor\OFF.png" alt="Cerrar sesión"> <!-- Cambia esta ruta -->
+        </button>
+    </div>
+    <script>
+        // Verifica si el usuario ha iniciado sesión
+        window.onload = function() {
+            const loggedIn = localStorage.getItem('loggedInUser'); // Asegúrate de que la clave sea la correcta
+            if (!loggedIn) {
+                window.location.href = 'login.html'; // Redirigir a la página de inicio de sesión
+            }
+        };
+
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzu-5j4yPIabA2P11vK8OdQIOy4QskWuP4-RVWL342CskZSV_hAx-CVC1r5YTc3v9RlSQ/exec';
+
+        async function fetchData() {
+            try {
+                const response = await fetch(scriptURL);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        function updateCurrentValues(data) {
+            const latest = data[data.length - 1];
+            document.getElementById('co2-value').textContent = latest[1]; // Columna C
+            document.getElementById('temperature-value').textContent = latest[2]; // Columna D
+            document.getElementById('humidity-value').textContent = latest[3]; // Columna E
+        }
+
+        document.getElementById('general-button').addEventListener('click', () => {
+            window.location.href = 'general.html';
+        });
+        document.getElementById('co2-button').addEventListener('click', () => {
+            window.location.href = 'co2.html';
+        });
+        document.getElementById('temperature-button').addEventListener('click', () => {
+            window.location.href = 'temperatura.html';
+        });
+        document.getElementById('humidity-button').addEventListener('click', () => {
+            window.location.href = 'humedad.html';
+        });
+
+        // Manejo del cierre de sesión
+        document.getElementById('logoutButton').addEventListener('click', () => {
+            localStorage.removeItem('loggedInUser'); // Elimina el usuario guardado
+            window.location.href = 'login.html'; // Redirige al login
+        });
+
+        async function init() {
+            const data = await fetchData();
+            if (data) {
+                updateCurrentValues(data);
+            }
+            setInterval(async () => {
+                const newData = await fetchData();
+                if (newData) {
+                    updateCurrentValues(newData);
+                }
+            }, 5000); // Actualiza cada 5 segundos
+        }
+
+        init();
+
+    </script>
+</body>
+</html>
