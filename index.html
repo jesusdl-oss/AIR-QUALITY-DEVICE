@@ -105,7 +105,7 @@
             gap: 20px;
         }
         .sensor-button {
-            background: #90CAF9; /* Azul pastel */
+            background: #64B5F6; /* Azul pastel más oscuro */
             border: none;
             color: #ffffff;
             padding: 15px 32px;
@@ -213,7 +213,6 @@
     </div>
 
     <script>
-        // Verifica si el usuario ha iniciado sesión
         window.onload = function() {
             const loggedInUser = localStorage.getItem('loggedInUser');
             if (!loggedInUser) {
@@ -221,7 +220,6 @@
             }
         };
 
-        // Funciones para redirigir a otras páginas
         document.getElementById('general-button').addEventListener('click', () => {
             window.location.href = 'general.html';
         });
@@ -235,13 +233,11 @@
             window.location.href = 'humedad.html';
         });
 
-        // Función para cerrar sesión
         document.getElementById('logoutButton').addEventListener('click', () => {
             localStorage.removeItem('loggedInUser');
             window.location.href = 'login.html';
         });
 
-        // Función para actualizar valores desde Google Sheets
         const scriptURL = 'https://script.google.com/macros/s/AKfycbzu-5j4yPIabA2P11vK8OdQIOy4QskWuP4-RVWL342CskZSV_hAx-CVC1r5YTc3v9RlSQ/exec';
 
         async function fetchData() {
@@ -297,7 +293,7 @@
             data: {
                 datasets: [{
                     data: [0, 100],
-                    backgroundColor: ['#90CAF9', '#E0E0E0'] /* Azul pastel */
+                    backgroundColor: ['#90CAF9', '#E0E0E0']
                 }]
             },
             options: {
