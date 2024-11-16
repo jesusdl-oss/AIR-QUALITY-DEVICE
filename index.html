@@ -90,17 +90,9 @@
             border-radius: 12px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
             text-align: center;
+            background: rgba(255, 255, 255, 0.9);
             width: 140px;
             margin: 0 auto;
-        }
-        .indicator-co2 {
-            background: #E8F5E9; /* Verde pastel */
-        }
-        .indicator-temperature {
-            background: #FFEBEE; /* Rojo pastel */
-        }
-        .indicator-humidity {
-            background: #E3F2FD; /* Azul pastel */
         }
         .indicator-box canvas {
             width: 120px;
@@ -113,12 +105,12 @@
             gap: 20px;
         }
         .sensor-button {
-            background-color: #90CAF9; /* Azul pastel más oscuro */
+            background: #90CAF9; /* Azul pastel */
             border: none;
-            color: #0D47A1; /* Azul oscuro */
+            color: #ffffff;
             padding: 15px 32px;
             font-size: 16px;
-            border-radius: 10px;
+            border-radius: 20px;
             cursor: pointer;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
             display: flex;
@@ -127,23 +119,20 @@
             gap: 10px;
             width: 100%;
             max-width: 250px;
-            transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
-            font-family: 'Roboto', sans-serif;
-            font-weight: 500;
+            transition: transform 0.3s, box-shadow 0.3s;
         }
         .sensor-button img {
             width: 30px;
         }
         .sensor-button:hover {
-            transform: scale(1.03); /* Efecto de zoom suave */
-            background-color: #64B5F6; /* Azul pastel al pasar el cursor */
+            transform: scale(1.05);
             box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2);
         }
         .logout-button {
             position: absolute;
             bottom: 20px;
             left: 20px;
-            background: #C62828;
+            background: #FF6F61;
             border: none;
             padding: 10px;
             border-radius: 50%;
@@ -222,7 +211,37 @@
             </div>
         </div>
     </div>
+
     <script>
+        // Verifica si el usuario ha iniciado sesión
+        window.onload = function() {
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            if (!loggedInUser) {
+                window.location.href = 'login.html';
+            }
+        };
+
+        // Funciones para redirigir a otras páginas
+        document.getElementById('general-button').addEventListener('click', () => {
+            window.location.href = 'general.html';
+        });
+        document.getElementById('co2-button').addEventListener('click', () => {
+            window.location.href = 'co2.html';
+        });
+        document.getElementById('temperature-button').addEventListener('click', () => {
+            window.location.href = 'temperatura.html';
+        });
+        document.getElementById('humidity-button').addEventListener('click', () => {
+            window.location.href = 'humedad.html';
+        });
+
+        // Función para cerrar sesión
+        document.getElementById('logoutButton').addEventListener('click', () => {
+            localStorage.removeItem('loggedInUser');
+            window.location.href = 'login.html';
+        });
+
+        // Función para actualizar valores desde Google Sheets
         const scriptURL = 'https://script.google.com/macros/s/AKfycbzu-5j4yPIabA2P11vK8OdQIOy4QskWuP4-RVWL342CskZSV_hAx-CVC1r5YTc3v9RlSQ/exec';
 
         async function fetchData() {
@@ -278,7 +297,7 @@
             data: {
                 datasets: [{
                     data: [0, 100],
-                    backgroundColor: ['#1565C0', '#E0E0E0'] /* Azul */
+                    backgroundColor: ['#90CAF9', '#E0E0E0'] /* Azul pastel */
                 }]
             },
             options: {
