@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio de Sesión</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
             background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('UTB.jpg');
@@ -14,55 +15,74 @@
             align-items: center;
             height: 100vh;
             margin: 0;
+            font-family: 'Space Grotesk', sans-serif;
         }
         .container {
-            background: rgba(255, 255, 255, 0.8); /* Fondo blanco semi-transparente */
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
-        }
-        input {
-            margin-bottom: 10px;
-            padding: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
             width: 100%;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: #007BFF;
-            color: white;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-            margin-bottom: 10px;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .loading {
-            display: none;
+            max-width: 400px;
             text-align: center;
         }
         h2 {
-            text-align: center;
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        input {
+            margin-bottom: 15px;
+            padding: 12px 15px;
+            width: 100%;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-sizing: border-box;
+        }
+        .button {
+            background-color: #6FB1FC;
+            color: white;
+            font-size: 16px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 15px;
+            width: 100%;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: background-color 0.3s, transform 0.3s;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .button:hover {
+            background-color: #3F8FD2;
+            transform: scale(1.05);
+        }
+        .error-message {
+            color: red;
+            font-size: 14px;
+            display: none;
+            margin-top: 10px;
+        }
+        .loading-message {
+            font-size: 14px;
+            color: #333;
+            display: none;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Bienvenido, Inicia sesión</h2>
+        <h2>Bienvenido, Inicia Sesión</h2>
         <input type="text" id="username" placeholder="Usuario" required>
         <input type="password" id="password" placeholder="Contraseña" required>
-        <button id="loginButton">Ingresar</button>
-        <button id="guestButton">Ingresar como Invitado</button>
-        <p id="errorMessage" style="color: red; display: none;"></p>
-        <p id="loadingMessage" class="loading">Cargando...</p>
+        <button class="button" id="loginButton">Ingresar</button>
+        <button class="button" id="guestButton">Ingresar como Invitado</button>
+        <p id="errorMessage" class="error-message"></p>
+        <p id="loadingMessage" class="loading-message">Cargando...</p>
     </div>
 
     <script>
-        // Evento para el botón de "Ingresar"
         document.getElementById('loginButton').addEventListener('click', async () => {
             const user = document.getElementById('username').value;
             const password = document.getElementById('password').value;
@@ -77,7 +97,7 @@
             document.getElementById('errorMessage').style.display = 'none';
 
             try {
-                const response = await fetch('data/usuarios.txt'); // Verifica que la ruta sea correcta
+                const response = await fetch('data/usuarios.txt');
                 if (!response.ok) {
                     throw new Error('Error en la conexión: ' + response.statusText);
                 }
@@ -85,32 +105,31 @@
                 const data = await response.text();
                 const users = data.split('\n')
                     .map(line => line.split(':'))
-                    .filter(parts => parts.length === 2) // Filtra líneas no válidas
+                    .filter(parts => parts.length === 2)
                     .map(parts => ({ username: parts[0].trim(), password: parts[1].trim() }));
 
                 const userFound = users.find(u => u.username === user && u.password === password);
 
                 if (userFound) {
-                    localStorage.setItem('loggedInUser', user); // Guarda el usuario en localStorage
-                    localStorage.setItem('guest', 'false'); // Establece que no es invitado
-                    window.location.href = 'index.html'; // Redirige a la página principal
+                    localStorage.setItem('loggedInUser', user);
+                    localStorage.setItem('guest', 'false');
+                    window.location.href = 'index.html';
                 } else {
                     document.getElementById('errorMessage').textContent = 'Usuario o contraseña incorrectos';
                     document.getElementById('errorMessage').style.display = 'block';
                 }
             } catch (error) {
-                document.getElementById('errorMessage').textContent = error.message; // Muestra el error real
+                document.getElementById('errorMessage').textContent = error.message;
                 document.getElementById('errorMessage').style.display = 'block';
             } finally {
                 document.getElementById('loadingMessage').style.display = 'none';
             }
         });
 
-        // Evento para el botón de "Ingresar como Invitado"
         document.getElementById('guestButton').addEventListener('click', () => {
-            localStorage.setItem('loggedInUser', 'guest'); // Almacena el estado de invitado
-            localStorage.setItem('guest', 'true'); // Establece que es invitado
-            window.location.href = 'index.html'; // Redirige a la página principal
+            localStorage.setItem('loggedInUser', 'guest');
+            localStorage.setItem('guest', 'true');
+            window.location.href = 'index.html';
         });
     </script>
 </body>
