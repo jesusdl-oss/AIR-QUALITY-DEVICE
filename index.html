@@ -105,7 +105,7 @@
             gap: 20px;
         }
         .sensor-button {
-            background: #64B5F6; /* Azul pastel más oscuro */
+            background: #64B5F6;
             border: none;
             color: #ffffff;
             padding: 15px 32px;
@@ -152,6 +152,16 @@
         .logout-button:hover {
             transform: scale(1.1);
             box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Estilo responsivo */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column; /* Cambiar a disposición vertical en dispositivos móviles */
+            }
+            .indicators-container {
+                margin-top: 20px; /* Añadir espacio entre los cuadros */
+            }
         }
     </style>
 </head>
