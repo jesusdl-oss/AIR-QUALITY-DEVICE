@@ -18,6 +18,16 @@
             background-size: cover;
             background-position: center;
         }
+        .scrollable-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: auto;
+            height: 100vh;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
         .main-container {
             display: flex;
             gap: 20px;
@@ -105,7 +115,7 @@
             gap: 20px;
         }
         .sensor-button {
-            background: #64B5F6;
+            background: #64B5F6; /* Azul pastel más oscuro */
             border: none;
             color: #ffffff;
             padding: 15px 32px;
@@ -166,62 +176,63 @@
     </style>
 </head>
 <body>
-    <div class="main-container">
-        <!-- Panel principal -->
-        <div class="container">
-            <h1>Monitor de Calidad de Aire</h1>
-            <div class="current-values">
-                <h2>Valores Actuales</h2>
-                <div class="value-box value-co2">
-                    CO2: <span id="co2-value">-</span> ppm
+    <div class="scrollable-container">
+        <div class="main-container">
+            <!-- Panel principal -->
+            <div class="container">
+                <h1>Monitor de Calidad de Aire</h1>
+                <div class="current-values">
+                    <h2>Valores Actuales</h2>
+                    <div class="value-box value-co2">
+                        CO2: <span id="co2-value">-</span> ppm
+                    </div>
+                    <div class="value-box value-temperature">
+                        Temperatura: <span id="temperature-value">-</span> °C
+                    </div>
+                    <div class="value-box value-humidity">
+                        Humedad: <span id="humidity-value">-</span> %
+                    </div>
                 </div>
-                <div class="value-box value-temperature">
-                    Temperatura: <span id="temperature-value">-</span> °C
+                <div class="button-container">
+                    <button class="sensor-button" id="general-button">
+                        <img src="monitor/General.png" alt="General">
+                        General
+                    </button>
+                    <button class="sensor-button" id="co2-button">
+                        <img src="monitor/CO2.png" alt="CO2">
+                        CO2
+                    </button>
+                    <button class="sensor-button" id="temperature-button">
+                        <img src="monitor/Termometro.png" alt="Temperatura">
+                        Temperatura
+                    </button>
+                    <button class="sensor-button" id="humidity-button">
+                        <img src="monitor/Humedad.png" alt="Humedad">
+                        Humedad
+                    </button>
                 </div>
-                <div class="value-box value-humidity">
-                    Humedad: <span id="humidity-value">-</span> %
-                </div>
+                <button class="logout-button" id="logoutButton">
+                    <img src="monitor/OFF.png" alt="Cerrar sesión">
+                </button>
             </div>
-            <div class="button-container">
-                <button class="sensor-button" id="general-button">
-                    <img src="monitor/General.png" alt="General">
-                    General
-                </button>
-                <button class="sensor-button" id="co2-button">
-                    <img src="monitor/CO2.png" alt="CO2">
-                    CO2
-                </button>
-                <button class="sensor-button" id="temperature-button">
-                    <img src="monitor/Termometro.png" alt="Temperatura">
-                    Temperatura
-                </button>
-                <button class="sensor-button" id="humidity-button">
-                    <img src="monitor/Humedad.png" alt="Humedad">
-                    Humedad
-                </button>
-            </div>
-            <button class="logout-button" id="logoutButton">
-                <img src="monitor/OFF.png" alt="Cerrar sesión">
-            </button>
-        </div>
 
-        <!-- Panel de indicadores -->
-        <div class="indicators-container">
-            <div class="indicator-box indicator-co2">
-                <canvas id="co2-meter"></canvas>
-                <p>CO2</p>
-            </div>
-            <div class="indicator-box indicator-temperature">
-                <canvas id="temperature-meter"></canvas>
-                <p>Temperatura</p>
-            </div>
-            <div class="indicator-box indicator-humidity">
-                <canvas id="humidity-meter"></canvas>
-                <p>Humedad</p>
+            <!-- Panel de indicadores -->
+            <div class="indicators-container">
+                <div class="indicator-box indicator-co2">
+                    <canvas id="co2-meter"></canvas>
+                    <p>CO2</p>
+                </div>
+                <div class="indicator-box indicator-temperature">
+                    <canvas id="temperature-meter"></canvas>
+                    <p>Temperatura</p>
+                </div>
+                <div class="indicator-box indicator-humidity">
+                    <canvas id="humidity-meter"></canvas>
+                    <p>Humedad</p>
+                </div>
             </div>
         </div>
     </div>
-
     <script>
         window.onload = function() {
             const loggedInUser = localStorage.getItem('loggedInUser');
