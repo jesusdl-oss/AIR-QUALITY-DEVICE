@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>General</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Roboto:wght@300;500&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Space Grotesk', sans-serif;
@@ -20,13 +19,20 @@
             flex-direction: column;
             height: 100vh;
         }
-
-        .title {
-            font-size: 24px;
-            font-weight: bold;
-            color: white;
+        .main-container {
+            text-align: center;
+            padding: 20px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 900px;
+            width: 90%;
         }
-
+        .title {
+            font-size: 28px;
+            color: #333333;
+            margin-bottom: 20px;
+        }
         .back-button {
             position: absolute;
             top: 20px;
@@ -40,138 +46,68 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
         }
-
         .back-button img {
-            width: 38px;
-            height: 38px;
+            width: 30px;
+            height: 30px;
         }
-
         .button-container {
-            margin: 20px;
             display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
             gap: 15px;
+            margin: 20px 0;
         }
-
         button {
-            padding: 10px 20px;
+            padding: 12px 20px;
             font-size: 16px;
             border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            background-color: #4682B4;
-            color: white;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #5A9FD1;
-        }
-
-        .chart-container {
-            width: 90%;
-            max-width: 1000px;
-            background-color: rgba(255, 255, 255, 0.8);
             border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            background: #64B5F6; /* Azul pastel */
+            color: white;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, background 0.3s;
         }
-
+        button:hover {
+            background: #42A5F5;
+            transform: scale(1.05);
+            box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2);
+        }
+        .chart-container {
+            background: rgba(248, 249, 250, 0.9);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
         canvas {
             width: 100%;
-            height: 400px;
-            background-color: white;
-        }
-
-        /* Estilos para el modal de advertencia */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-            text-align: center;
-        }
-
-        .modal-content p {
-            margin: 0 0 20px 0;
-            font-size: 18px;
-        }
-
-        .modal-content button {
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            background-color: #007BFF;
-            color: white;
-            cursor: pointer;
-        }
-
-        .modal-content button:hover {
-            background-color: #0056b3;
+            max-height: 400px;
         }
     </style>
 </head>
 <body>
-
-    <!-- Modal de advertencia personalizado -->
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <p>Acceso restringido. Necesitas iniciar sesión con tus credenciales para acceder a esta página.</p>
-            <button id="closeModalButton">Entendido</button>
-        </div>
-    </div>
-
-    <div class="title">Gráfico General</div>
     <button class="back-button" onclick="history.back()">
-        <img src="monitor/flecha.png" alt="Flecha">
+        <img src="monitor/flecha.png" alt="Regresar">
     </button>
 
-    <div class="button-container">
-        <button onclick="loadChart('co2')">CO2</button>
-        <button onclick="loadChart('temperature')">Temperatura</button>
-        <button onclick="loadChart('humidity')">Humedad</button>
-        <button onclick="loadChart('general')">General</button>
-        <button onclick="downloadExcel()">Descargar Excel</button>
-        <button onclick="downloadJPG()">Descargar JPG</button>
-    </div>
-
-    <div class="chart-container">
-        <canvas id="generalChart"></canvas>
+    <div class="main-container">
+        <div class="title">Gráfico General</div>
+        <div class="button-container">
+            <button onclick="loadChart('co2')">CO2</button>
+            <button onclick="loadChart('temperature')">Temperatura</button>
+            <button onclick="loadChart('humidity')">Humedad</button>
+            <button onclick="loadChart('general')">General</button>
+            <button onclick="downloadJPG()">Descargar JPG</button>
+        </div>
+        <div class="chart-container">
+            <canvas id="generalChart"></canvas>
+        </div>
     </div>
 
     <script>
         let currentChart;
-        let currentData;
-
-        // Verificar si el usuario es un invitado
-        const isGuest = localStorage.getItem('guest');
-        if (isGuest === 'true') {
-            const modal = document.getElementById('modal');
-            modal.style.display = 'flex';
-
-            document.getElementById('closeModalButton').addEventListener('click', () => {
-                modal.style.display = 'none';
-                window.location.href = 'index.html'; // Redirigir a la página principal
-            });
-
-            setTimeout(() => {
-                window.location.href = 'index.html'; // Redirigir automáticamente después de 5 segundos
-            }, 5000);
-        }
 
         async function fetchData() {
             try {
@@ -208,41 +144,32 @@
             const data = await fetchData();
             if (!data) return;
 
-            currentData = calculateAverages(data); // Guardar los datos actuales
-            const labels = currentData.map(entry => entry.datetime);
+            const averages = calculateAverages(data);
+            const labels = averages.map(entry => entry.datetime);
 
-            let datasetLabel, chartData, borderColor, datasets = [];
+            let datasets = [];
 
             if (type === 'co2') {
-                datasetLabel = 'Promedio CO2 (ppm)';
-                chartData = currentData.map(entry => entry.co2Avg);
-                borderColor = 'rgba(255, 0, 0, 1)';
                 datasets.push({
-                    label: datasetLabel,
-                    data: chartData,
-                    borderColor: borderColor,
+                    label: 'Promedio CO2 (ppm)',
+                    data: averages.map(entry => entry.co2Avg),
+                    borderColor: 'rgba(255, 0, 0, 1)',
                     borderWidth: 2,
                     fill: false
                 });
             } else if (type === 'temperature') {
-                datasetLabel = 'Promedio Temperatura (°C)';
-                chartData = currentData.map(entry => entry.tempAvg);
-                borderColor = 'rgba(0, 0, 255, 1)';
                 datasets.push({
-                    label: datasetLabel,
-                    data: chartData,
-                    borderColor: borderColor,
+                    label: 'Promedio Temperatura (°C)',
+                    data: averages.map(entry => entry.tempAvg),
+                    borderColor: 'rgba(0, 0, 255, 1)',
                     borderWidth: 2,
                     fill: false
                 });
             } else if (type === 'humidity') {
-                datasetLabel = 'Promedio Humedad (%)';
-                chartData = currentData.map(entry => entry.humidityAvg);
-                borderColor = 'rgba(0, 255, 0, 1)';
                 datasets.push({
-                    label: datasetLabel,
-                    data: chartData,
-                    borderColor: borderColor,
+                    label: 'Promedio Humedad (%)',
+                    data: averages.map(entry => entry.humidityAvg),
+                    borderColor: 'rgba(0, 255, 0, 1)',
                     borderWidth: 2,
                     fill: false
                 });
@@ -250,22 +177,22 @@
                 datasets = [
                     {
                         label: 'Promedio CO2 (ppm)',
-                        data: currentData.map(entry => entry.co2Avg),
-                        borderColor: 'rgba(255, 0, 0, 1)', // Rojo
+                        data: averages.map(entry => entry.co2Avg),
+                        borderColor: 'rgba(255, 0, 0, 1)',
                         borderWidth: 2,
                         fill: false
                     },
                     {
                         label: 'Promedio Temperatura (°C)',
-                        data: currentData.map(entry => entry.tempAvg),
-                        borderColor: 'rgba(0, 0, 255, 1)', // Azul
+                        data: averages.map(entry => entry.tempAvg),
+                        borderColor: 'rgba(0, 0, 255, 1)',
                         borderWidth: 2,
                         fill: false
                     },
                     {
                         label: 'Promedio Humedad (%)',
-                        data: currentData.map(entry => entry.humidityAvg),
-                        borderColor: 'rgba(0, 255, 0, 1)', // Verde
+                        data: averages.map(entry => entry.humidityAvg),
+                        borderColor: 'rgba(0, 255, 0, 1)',
                         borderWidth: 2,
                         fill: false
                     }
@@ -310,43 +237,24 @@
             });
         }
 
-        // Función para descargar los datos en formato Excel
-        function downloadExcel() {
-            if (!currentData) {
-                alert('No hay datos disponibles para descargar.');
-                return;
-            }
-
-            // Crear una hoja de cálculo con los datos actuales
-            const wb = XLSX.utils.book_new();
-            const ws_data = [
-                ['Fecha y Hora', 'Promedio CO2 (ppm)', 'Promedio Temperatura (°C)', 'Promedio Humedad (%)']
-            ];
-
-            currentData.forEach(entry => {
-                ws_data.push([entry.datetime, entry.co2Avg, entry.tempAvg, entry.humidityAvg]);
-            });
-
-            const ws = XLSX.utils.aoa_to_sheet(ws_data);
-            XLSX.utils.book_append_sheet(wb, ws, 'Datos Generales');
-
-            // Descargar el archivo Excel
-            XLSX.writeFile(wb, 'grafico_datos_generales.xlsx');
-        }
-
-        // Función para descargar el gráfico en formato JPG
         function downloadJPG() {
             const canvas = document.getElementById('generalChart');
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = canvas.width;
+            tempCanvas.height = canvas.height;
+
+            const ctx = tempCanvas.getContext('2d');
+            ctx.fillStyle = 'white'; // Fondo blanco
+            ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+            ctx.drawImage(canvas, 0, 0);
+
             const link = document.createElement('a');
-            link.href = canvas.toDataURL('image/jpeg', 1.0); // Convertir canvas a imagen JPG
-            link.download = 'grafico_general.jpg'; // Nombre del archivo descargado
-            link.click(); // Simular el clic para descargar la imagen
+            link.href = tempCanvas.toDataURL('image/jpeg', 1.0);
+            link.download = 'grafico_general.jpg';
+            link.click();
         }
 
-        // Cargar el gráfico de CO2 al cargar la página
         loadChart('co2');
-
-
     </script>
 </body>
 </html>
